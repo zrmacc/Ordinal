@@ -1,0 +1,82 @@
+---
+title: "README"
+author: "Zachary McCaw"
+date: "`r Sys.Date()`"
+output: 
+  html_document: 
+    keep_md: TRUE
+--- 
+
+```{r global_options, include=FALSE}
+knitr::opts_chunk$set(cache = TRUE)
+```
+
+# Description
+
+This package provides functions for inference the difference in quantiles and probability indices comparing two treatment arms. 
+
+# Installation
+
+```{R, eval=FALSE}
+devtools::install_github(repo = 'zrmacc/Ordinal')
+```
+
+# Examples
+
+Simulated example data. 
+
+```{R}
+library(Ordinal)
+arm0 <- as.numeric(rmultinom(n = 1, size = 200, prob = c(0.25, 0.25, 0.25, 0.25)))
+arm1 <- as.numeric(rmultinom(n = 1, size = 200, prob = c(0.10, 0.30, 0.30, 0.30)))
+names(arm0) = names(arm1) <- paste0('Category ', seq(1:4))
+show(arm0)
+show(arm1)
+```
+
+## Difference in Quantiles
+
+To find a confidence interval and p-vaue for the difference in medians $q = 0.5$:
+```{r}
+# Confidence interval calculation.
+ci <- QuantDiffCI(
+  counts0 = arm0,
+  counts1 = arm1,
+  q = 0.5
+)
+round(ci, digits = 2)
+
+# P-value calculation. 
+pval <- QuantDiffP(
+  counts0 = arm0,
+  counts1 = arm1,
+  q = 0.5
+)
+round(pval, digits = 2)
+```
+
+Note that the medians are linearly interpolated within integer bins. 
+
+## Difference in Probability Indices
+
+The difference in probability indices is defined as:
+$$
+\Delta = P(Y_{1} > Y_{0}) - P(Y_{0} > Y_{1}).
+$$
+
+To find a confidence interval and p-vaue for the difference in probability indices:
+```{r}
+# Confidence interval calculation.
+ci <- ProbIndexDiffCI(
+  counts0 = arm0,
+  counts1 = arm1
+)
+round(ci, digits = 2)
+
+# P-value calculation. 
+pval <- ProbIndexDiffP(
+  counts0 = arm0,
+  counts1 = arm1
+)
+round(pval, digits = 2)
+```
